@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import axios from "axios";
 import Filter from './components/Filter';
 import Persons from './components/Persons';
 import PersonForm from './components/PersonForm';
+import pplService from "./services/people"
 
 const App = () => {
   const [ persons, setPersons  ] = useState([]);
@@ -11,27 +11,36 @@ const App = () => {
   const [ searchValue, setSearchValue ] = useState("");
   const [ showAll, setShowAll ] = useState(true);
 
-  const hook = () => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
+  useEffect(() => {
+    pplService
+      .getAll()
       .then(response => {
-        console.log('promise fulfilled')
         setPersons(response.data)
       })
-  }
-  
-  useEffect(hook, [])
+  }, [])
 
   const addPerson = (event) => {
     event.preventDefault();
     
     for (const key of persons) {
       if ( key.name === newName ) {
-        alert(`${newName} already exists in the phonebook`)
-        setNewName("");
-        setNewNumber("");
+        if (window.confirm(`${newName} already exists in the phonebook, would you like to replace the old number with the new one?`)) {
+          const person = persons.find(p => p.name === newName)
+          const changedPerson = {...person, number: newNumber}
+      
+          pplService
+            .update(person.id, changedPerson)
+            .then(response => {
+              setPersons(persons.map(person => person.name !== newName ? person : response.data))
+            })
+            .catch(error => {
+              alert(
+                `The person "${person.name}" was already deleted from the server`
+              )
+              //setPersons(persons.filter(p => p.name !== id))
+            })
         return;
+        }
       }
     }
 
@@ -40,9 +49,13 @@ const App = () => {
       number: newNumber,
     }
 
-    setPersons(persons.concat(personObject));
-    setNewName("");
-    setNewNumber("");
+    pplService
+      .create(personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName("");
+        setNewNumber("");
+      })
   }
 
   const namesToShow = showAll
@@ -65,14 +78,37 @@ const App = () => {
     setShowAll(false);
   }
 
+  const deletePerson = (id) => {
+    const person = persons.find(p => p.id === id)
+
+
+    if ( window.confirm(`Do you really want to delete ${person.name} from the phonebook?` )) {
+      pplService
+      .deleteDude(id)
+      .then(response => {
+        setPersons(persons.filter(p => p.id !== id))
+      })
+      .catch(error => {
+        alert(
+          `The person "${person.name}" was already deleted from the server`
+        )
+        setPersons(persons.filter(p => p.id !== id))
+      })
+    }
+  }
+
   return (
-    <div>
-      <h2>Phonebook</h2>
-      <Filter search={searchValue} onChange={handleSearchChange}/>
-      <PersonForm name={newName} onNameChange={handleNameChange} number={newNumber} onNumberChange={handleNumberChange} onSubmit={addPerson} />
-      <Persons persons={namesToShow} />
-    </div>
-  )
+      <div>
+        <h2>Phonebook</h2>
+        <Filter search={searchValue} onChange={handleSearchChange}/>
+        <PersonForm name={newName} onNameChange={handleNameChange} number={newNumber} onNumberChange={handleNumberChange} onSubmit={addPerson} />
+        <h2>Numbers</h2>
+        {namesToShow.map((person, i) =>
+          <Persons key={i} persons={person}
+          deletePerson={() => deletePerson(person.id)} />
+        )}
+      </div>
+  );
 }
 
 export default App;

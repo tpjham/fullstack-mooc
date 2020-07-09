@@ -3,10 +3,8 @@ import React from 'react';
 const Persons = (props) => {
   return (
     <div>
-    <h2>Numbers</h2>
-    {props.persons.map(person => 
-      <p key={person.name}>{person.name}    {person.number}</p>
-    )}      
+      <p>{props.persons.name}    {props.persons.number} 
+      <button onClick={props.deletePerson}>Delete</button></p>
     </div>
   );
 };
