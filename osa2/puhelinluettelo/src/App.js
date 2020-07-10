@@ -2,7 +2,8 @@ import React, {useState, useEffect} from 'react';
 import Filter from './components/Filter';
 import Persons from './components/Persons';
 import PersonForm from './components/PersonForm';
-import pplService from "./services/people"
+import pplService from "./services/people";
+import Alert from "./components/Alert";
 
 const App = () => {
   const [ persons, setPersons  ] = useState([]);
@@ -10,6 +11,8 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState("");
   const [ searchValue, setSearchValue ] = useState("");
   const [ showAll, setShowAll ] = useState(true);
+  const [ message, setMessage ] = useState(null)
+  const [ alertStyle, setAlertStyle ] = useState(null)
 
   useEffect(() => {
     pplService
@@ -32,12 +35,24 @@ const App = () => {
             .update(person.id, changedPerson)
             .then(response => {
               setPersons(persons.map(person => person.name !== newName ? person : response.data))
+              setNewName("");
+              setNewNumber("");
+              setMessage(`Changed the number for ${newName}`)
+              setAlertStyle("notification")
+              setTimeout( () => {
+                setMessage(null)
+                setAlertStyle(null)
+              }, 5000)
             })
             .catch(error => {
-              alert(
-                `The person "${person.name}" was already deleted from the server`
+              setMessage(
+                `Information of ${newName} has already been removed from the server`
               )
-              //setPersons(persons.filter(p => p.name !== id))
+              setAlertStyle("error")
+              setTimeout(() => {
+                setMessage(null)
+                setAlertStyle(null)
+              }, 5000)
             })
         return;
         }
@@ -55,6 +70,12 @@ const App = () => {
         setPersons(persons.concat(response.data))
         setNewName("");
         setNewNumber("");
+        setMessage(`Added ${newName}`)
+        setAlertStyle("notification")
+        setTimeout( () => {
+          setMessage(null)
+          setAlertStyle(null)
+        }, 5000)
       })
   }
 
@@ -87,11 +108,20 @@ const App = () => {
       .deleteDude(id)
       .then(response => {
         setPersons(persons.filter(p => p.id !== id))
+        setMessage(`Removed "${person.name}" from the phonebook`)
+        setAlertStyle("error")
+        setTimeout( () => {
+          setMessage(null)
+          setAlertStyle(null)
+        }, 5000)
       })
       .catch(error => {
-        alert(
-          `The person "${person.name}" was already deleted from the server`
-        )
+        setMessage(`The person "${person.name}" was already deleted from the server`)
+        setAlertStyle("error")
+        setTimeout( () => {
+          setMessage(null)
+          setAlertStyle(null)
+        }, 5000)
         setPersons(persons.filter(p => p.id !== id))
       })
     }
@@ -100,6 +130,7 @@ const App = () => {
   return (
       <div>
         <h2>Phonebook</h2>
+        <Alert message={message} alertStyle={alertStyle} />
         <Filter search={searchValue} onChange={handleSearchChange}/>
         <PersonForm name={newName} onNameChange={handleNameChange} number={newNumber} onNumberChange={handleNumberChange} onSubmit={addPerson} />
         <h2>Numbers</h2>

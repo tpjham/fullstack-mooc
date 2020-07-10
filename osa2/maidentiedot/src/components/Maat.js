@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Maat = (props) => {
 
@@ -21,9 +21,11 @@ const Maat = (props) => {
   if ( props.maat.length > 1 && props.maat.length < 11) {
     return (
       <div>
-      {props.maat.map(maa => 
-        <p key={maa.name}>{maa.name}</p>
-      )}      
+        {props.maat.map(maa => 
+        <div key={maa.alpha3Code}>
+          <Info key={maa.alpha3Code} maa={maa} />
+        </div >
+      )}
       </div>
     )
   }
@@ -44,14 +46,44 @@ const Maat = (props) => {
           {maa.languages.map(lang => 
             <ul key={lang.iso639_2}>{lang.name}</ul>  
           )}
-        <div>
-        <img style={{height:'100px'}} src={maa.flag}/> 
-        </div>
+          <div>
+            <img style={{height:'100px'}} src={maa.flag} alt={""}/> 
+          </div>
         </div>
       )}      
       </div>
     )
   }
 };
+
+const Info = ({maa}) => {
+  const [showInfo, setShowInfo] = useState(false);
+
+  const label = showInfo
+    ? "Hide" : "Show"
+
+  const naytaExtra = () => {
+    setShowInfo(!showInfo);
+  }
+
+  return (
+    <div>
+      <p key={maa.name}>{maa.name}<button onClick={() => naytaExtra()}>{label}</button></p>
+      { showInfo ? 
+        <div>  
+          Capital {maa.capital} <br/>
+          Population {maa.population}
+          <h2>Languages</h2>
+          {maa.languages.map(lang => 
+            <ul key={lang.iso639_2}>{lang.name}</ul>  
+          )}
+          <div>
+            <img style={{height:'100px'}} src={maa.flag} alt={""}/> 
+          </div>
+        </div>
+         : null}
+    </div>
+  )
+}
 
 export default Maat;

@@ -30,8 +30,26 @@
     {
       "content": "Test",
       "date": "2020-07-09T10:53:16.878Z",
-      "important": false,
+      "important": true,
       "id": 7
+    },
+    {
+      "content": "Test",
+      "date": "2020-07-09T16:05:50.123Z",
+      "important": true,
+      "id": 8
+    },
+    {
+      "content": "",
+      "date": "2020-07-09T16:05:53.294Z",
+      "important": false,
+      "id": 9
+    },
+    {
+      "content": "",
+      "date": "2020-07-09T16:05:54.815Z",
+      "important": true,
+      "id": 10
     }
   ]
 }
