@@ -8,13 +8,13 @@ const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [showAll, setShowAll] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("Something went wrong...")
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     noteService
       .getAll()
       .then(response => {
-        setNotes(response.data)
+        setNotes(response)
       })
   }, [])
 
@@ -24,12 +24,13 @@ const App = () => {
       content: newNote,
       date: new Date().toISOString(),
       important: Math.random() > 0.5,
+      id: notes.length + 1,
     }
 
     noteService
       .create(noteObject)
       .then(response => {
-        setNotes(notes.concat(response.data))
+        setNotes(notes.concat(response))
         setNewNote("")
       })
   }
@@ -43,13 +44,14 @@ const App = () => {
     : notes.filter(note => note.important === true);
 
   const toggleImportanceOf = (id) => {
+    const url = `http://localhost:3001/notes/${id}`
     const note = notes.find(n => n.id === id)
     const changedNote = {...note, important: !note.important}
 
     noteService
       .update(id, changedNote)
       .then(response => {
-        setNotes(notes.map(note => note.id !== id ? note : response.data))
+        setNotes(notes.map(note => note.id !== id ? note : response))
       })
       .catch(error => {
         setErrorMessage(
