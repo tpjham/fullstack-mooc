@@ -18,7 +18,7 @@ const App = () => {
     pplService
       .getAll()
       .then(response => {
-        setPersons(response.data)
+        setPersons(response)
       })
   }, [])
 
@@ -34,7 +34,7 @@ const App = () => {
           pplService
             .update(person.id, changedPerson)
             .then(response => {
-              setPersons(persons.map(person => person.name !== newName ? person : response.data))
+              setPersons(persons.map(person => person.name !== newName ? person : response))
               setNewName("");
               setNewNumber("");
               setMessage(`Changed the number for ${newName}`)
@@ -67,7 +67,7 @@ const App = () => {
     pplService
       .create(personObject)
       .then(response => {
-        setPersons(persons.concat(response.data))
+        setPersons(persons.concat(response))
         setNewName("");
         setNewNumber("");
         setMessage(`Added ${newName}`)
@@ -76,6 +76,16 @@ const App = () => {
           setMessage(null)
           setAlertStyle(null)
         }, 5000)
+        console.log(response)
+      })
+      .catch(error => {
+        setMessage(`Validation failed: ${error.response.data.error}`)
+        setAlertStyle("error")
+        setTimeout( () => {
+          setMessage(null)
+          setAlertStyle(null)
+        }, 5000)
+        console.log(error.response.data)
       })
   }
 
