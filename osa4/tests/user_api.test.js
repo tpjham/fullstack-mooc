@@ -60,6 +60,27 @@ describe("When there is initially one user at db", () => {
       const usersAtEnd = await helper.usersInDb()
       expect(usersAtEnd).toHaveLength(usersAtStart.length)
     })
+
+    test("Creating new user fails if password length is lower than 3", async () => {
+      const usersAtStart = await helper.usersInDb()
+
+      const newUser = {
+        username: "test",
+        name: "Testy",
+        password: "sa"
+      }
+
+      const result = await api
+        .post("/api/users")
+        .send(newUser)
+        .expect(400)
+        .expect("Content-Type", /application\/json/)
+
+      expect(result.body.error).toContain("Password too short")
+
+      const usersAtEnd = await helper.usersInDb()
+      expect(usersAtEnd).toHaveLength(usersAtStart.length)
+    })
   })
 })
 

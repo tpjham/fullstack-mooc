@@ -3,12 +3,20 @@ const supertest = require("supertest")
 const helper = require("../utils/test_helper")
 const app = require("../app")
 const api = supertest(app)
+const bcrypt = require("bcrypt")
 
 const Blog = require("../models/blog")
+const User = require("../models/user")
 
 describe("When initially saving some notes", () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
+
+
+    const passwordHash = await bcrypt.hash("sekret", 10)
+    const user = new User({ username: "root", passwordHash })
+    await user.save()
 
     await Blog.insertMany(helper.initialBlogs)
   })
@@ -54,15 +62,34 @@ describe("When initially saving some notes", () => {
     describe("Adding new blogs", () => {
 
       test("A valid note can be added", async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const userid = usersAtStart[0].id
+
         const newBlog = {
           title: "Added through test",
           author: "Async/Await",
           url: "jest",
-          likes: 420
+          likes: 420,
+          user: userid
         }
+
+        let token = ""
+
+        await api
+          .post("/api/login")
+          .send({
+            username: "root",
+            password: "sekret"
+          })
+          .expect((res) => {
+            token = res.body.token
+          })
+          .expect(200)
 
         await api
           .post("/api/blogs")
+          .set("Authorization", `bearer ${token}`)
           .send(newBlog)
           .expect(200)
           .expect("Content-Type", /application\/json/)
@@ -74,14 +101,56 @@ describe("When initially saving some notes", () => {
         expect(titles).toContain("Added through test")
       })
 
-      test("Blog without title is not added", async () => {
+      test("Blog can't be added without authorization header in request", async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const userid = usersAtStart[0].id
+
         const newBlog = {
-          author: "Testy McGee",
-          likes: 1
+          author: "Async/Await",
+          url: "jest",
+          likes: 420,
+          user: userid
         }
 
         await api
           .post("/api/blogs")
+          .send(newBlog)
+          .expect(401)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+      })
+
+      test("Blog without title is not added", async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const userid = usersAtStart[0].id
+
+        const newBlog = {
+          author: "Async/Await",
+          url: "jest",
+          likes: 420,
+          user: userid
+        }
+
+        let token = ""
+
+        await api
+          .post("/api/login")
+          .send({
+            username: "root",
+            password: "sekret"
+          })
+          .expect((res) => {
+            token = res.body.token
+          })
+          .expect(200)
+
+        await api
+          .post("/api/blogs")
+          .set("Authorization", `bearer ${token}`)
           .send(newBlog)
           .expect(400)
 
@@ -105,15 +174,34 @@ describe("When initially saving some notes", () => {
       })
 
       test("Blog with no likes has likes set to 0 on post", async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const userid = usersAtStart[0].id
+
         const newBlog = {
-          title: "Testing likes set",
+          title: "Added through test",
           author: "Async/Await",
           url: "jest",
-          likes: null
+          likes: null,
+          user: userid
         }
+
+        let token = ""
+
+        await api
+          .post("/api/login")
+          .send({
+            username: "root",
+            password: "sekret"
+          })
+          .expect((res) => {
+            token = res.body.token
+          })
+          .expect(200)
 
         await api
           .post("/api/blogs")
+          .set("Authorization", `bearer ${token}`)
           .send(newBlog)
           .expect(200)
           .expect("Content-Type", /application\/json/)
@@ -129,20 +217,52 @@ describe("When initially saving some notes", () => {
       describe("Deleting blogs", () => {
 
         test("A blog can be deleted", async () => {
-          const blogsAtStart = await helper.blogsInDb()
-          const blogToDelete = blogsAtStart[0]
+          const usersAtStart = await helper.usersInDb()
+
+          const userid = usersAtStart[0].id
+
+          const newBlog = {
+            title: "Added through test",
+            author: "Async/Await",
+            url: "jest",
+            likes: 420,
+            user: userid
+          }
+
+          let token = ""
 
           await api
-            .delete(`/api/blogs/${blogToDelete.id}`)
+            .post("/api/login")
+            .send({
+              username: "root",
+              password: "sekret"
+            })
+            .expect((res) => {
+              token = res.body.token
+            })
+            .expect(200)
+
+
+          await api
+            .post("/api/blogs")
+            .set("Authorization", `bearer ${token}`)
+            .send(newBlog)
+
+          const tempBlogs = await helper.blogsInDb()
+          const blog = tempBlogs[tempBlogs.length - 1]
+
+          await api
+            .delete(`/api/blogs/${blog.id}`)
+            .set("Authorization", `bearer ${token}`)
             .expect(204)
 
           const blogsAtEnd = await helper.blogsInDb()
 
-          expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+          expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 
           const titles = blogsAtEnd.map(r => r.title)
 
-          expect(titles).not.toContain(blogToDelete.title)
+          expect(titles).not.toContain(blog.title)
         })
       })
     })

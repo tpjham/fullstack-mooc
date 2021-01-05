@@ -6,13 +6,15 @@ const initialBlogs = [
     title: "Post test",
     author: "Testy McGee",
     url: "String",
-    likes: 69
+    likes: 69,
+    user: "5ff40f57786a06202001b3f4"
   },
   {
     title: "Post test2",
     author: "Testy McGee2",
     url: "String",
-    likes: 69
+    likes: 69,
+    user: "5ff40f57786a06202001b3f4"
   }
 ]
 
