@@ -3,3 +3,6 @@ puhlubackend/.env
 osa4/.env
 osa4/node_modules
 puhlubackend/.env
+osa4/backupenv
+osa5/node_modules
+osa5/frontend/node_modules
