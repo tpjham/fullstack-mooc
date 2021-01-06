@@ -1,0 +1,2 @@
+PORT=3003
+MONGODB_URI=mongodb+srv://fullstack:fullstackmooc@cluster0.z8qsq.mongodb.net/blog-app?retryWrites=true&w=majority

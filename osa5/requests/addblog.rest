@@ -1,0 +1,11 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlZ2VlMiIsImlkIjoiNWZmNDE3Y2E1Y2NjMDUxZGNjNjg1NjIxIiwiaWF0IjoxNjA5ODM0OTc3fQ.HSUSBpH5CFUDEuLIzwccO2y6sEvGlOrziaLafTLdoAo
+
+{
+  "title": "Post test4",
+  "author": "Testy McGee",
+  "url": "String",
+  "likes": 69,
+  "user": "5ff417ca5ccc051dcc685621"
+}
