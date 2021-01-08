@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
+import React, { useState, useEffect, useRef } from "react"
+import Blog from "./components/Blog"
+import blogService from "./services/blogs"
 import loginService from "./services/loginService"
-import Alert from "./components/Alert";
+import Alert from "./components/Alert"
 import BlogForm from "./components/BlogForm"
-import LoginForm from './components/LoginForm';
+import LoginForm from "./components/LoginForm"
 import Togglable from "./components/Togglable"
 
 const App = () => {
@@ -18,7 +18,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -60,14 +60,14 @@ const App = () => {
   const blogUpvote = (id, upvotedBlog) => {
     blogService
       .update(id, upvotedBlog)
-      .then(response => {
+      .then(() => {
         setBlogs(blogs.map(blog => blog.id !== id ? blog : upvotedBlog))
       })
   }
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -119,21 +119,21 @@ const App = () => {
         <div>
           <p>
           Logged in as {user.name}
-          <button onClick={handleLogout}>
+            <button onClick={handleLogout}>
             Logout
-          </button>
-        </p>
-        <div>
-          {blogForm()}
-        </div>
-        {blogs.sort((a,b) => {
-          if ( a.likes > b.likes ) return -1
-          if ( a.likes < b.likes ) return 1
-          return 0
-        }).map(blog =>
-          <Blog key={blog.id} blog={blog} blogUpvote={blogUpvote} />
-        )}
-      </div>}
+            </button>
+          </p>
+          <div>
+            {blogForm()}
+          </div>
+          {blogs.sort((a,b) => {
+            if ( a.likes > b.likes ) return -1
+            if ( a.likes < b.likes ) return 1
+            return 0
+          }).map(blog =>
+            <Blog key={blog.id} blog={blog} blogUpvote={blogUpvote} />
+          )}
+        </div>}
     </div>
   )
 }
