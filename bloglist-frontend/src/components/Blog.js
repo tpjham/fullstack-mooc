@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react"
 
 const Blog = ({ blog, blogUpvote }) => {
   const [ showInfo, toggleShowInfo ] = useState(false)
@@ -10,8 +10,8 @@ const Blog = ({ blog, blogUpvote }) => {
     blogUpvote(blog.id, {
       id: blog.id,
       user: (blog.user === null ?
-              "" :
-              blog.user),
+        "" :
+        blog.user),
       likes: blog.likes + 1,
       author: blog.author,
       title: blog.title,
@@ -36,7 +36,7 @@ const Blog = ({ blog, blogUpvote }) => {
   )
 
   return (
-    <div>
+    <div className="blog">
       {blog.title} by {blog.author} <button onClick={() => toggleShowInfo(!showInfo)}>
         {showInfo ?
           "Hide" :
