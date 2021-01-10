@@ -40,10 +40,7 @@ describe("Blog ", function() {
 
     describe("When logged in", function() {
       beforeEach(function() {
-        cy.contains("login").click()
-        cy.get("#username").type("tegee")
-        cy.get("#password").type("sekret")
-        cy.get("#login-button").click()
+        cy.login({ username: "tegee", password: "sekret" })
       })
 
       it("A new blog can be added", function() {
@@ -57,16 +54,15 @@ describe("Blog ", function() {
 
       describe("And a blog exists", function() {
         beforeEach(function() {
-          cy.contains("New blog").click()
-          cy.get("#title").type("Cypress end-to-end testing")
-          cy.get("#author").type("Cypress")
-          cy.get("#url").type("127.0.0.1")
-          cy.get("#submit-blog").click()
-          cy.contains("Cypress end-to-end testing")
+          cy.createBlog({
+            title: "Created with command",
+            author: "Automated",
+            url: "null"
+          })
         })
 
         it("Blog can be liked", function() {
-          cy.get(".blog").contains("Cypress end-to-end testing by Cypress")
+          cy.get(".blog").contains("Created with command by Automated")
             .contains("Show")
             .click()
           cy.contains("Likes: 0")
@@ -77,17 +73,40 @@ describe("Blog ", function() {
         })
 
         it("Blog can be removed", function() {
-          cy.get(".blog").contains("Cypress end-to-end testing by Cypress")
+          cy.get(".blog").contains("Created with command by Automated")
             .contains("Show")
             .click()
           cy.contains("Remove blog")
             .click()
-          cy.get(".blog").contains("Cypress end-to-end testing by Cypress").should("not.exist")
+          cy.get(".blog").contains("Created with command by Automated").should("not.exist")
         })
 
-        it("Blogs are displayed in order of most likes -> least likes", function() {
+        it.only("Blogs are displayed in order of most likes -> least likes", function() {
           //TODO: Get all blogs, compare found list with shown blogs to ensure blogs are in correct order
+          cy.createBlog({
+            title: "Created with command2",
+            author: "Automated2",
+            url: "null2"
+          })
 
+          cy.get(".blog").then( blogs => {
+            return cy.wrap(blogs[0])
+
+          }).contains("Created with command by Automated")
+
+          cy.get(".blog").contains("Created with command2 by Automated2")
+            .contains("Show")
+            .click()
+          cy.intercept("/api/blogs").as("blogApi")
+          cy.contains("Likes: 0")
+            .contains("Like")
+            .click()
+          cy.wait("@blogApi")
+
+          cy.get(".blog").then( blogs => {
+            return cy.wrap(blogs[0])
+
+          }).contains("Created with command2 by Automated2")
         })
       })
     })
