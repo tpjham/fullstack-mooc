@@ -65,6 +65,16 @@ const App = () => {
       })
   }
 
+  const blogRemove = (blog) => {
+    blogService
+      .remove(blog.id)
+      .then(() => {
+        setBlogs(blogs.filter((b) => {
+          return b.id !== blog.id
+        }))
+      })
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -131,7 +141,7 @@ const App = () => {
             if ( a.likes < b.likes ) return 1
             return 0
           }).map(blog =>
-            <Blog key={blog.id} blog={blog} blogUpvote={blogUpvote} />
+            <Blog key={blog.id} blog={blog} blogUpvote={blogUpvote} blogRemove={blogRemove} />
           )}
         </div>}
     </div>

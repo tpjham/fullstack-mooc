@@ -30,25 +30,26 @@ const BlogForm = ({ createBlog }) => {
     setNewUrl("")
   }
   return (
-    <div>
-      <div>
-        <h2>Add new blog</h2>
-      </div>
+    <div className="formDiv">
+      <h2>Add new blog</h2>
       <form onSubmit={addBlog}>
         <div> Title: <input
+          id="title"
           value={newTitle}
           onChange={handleTitleChange}
         /></div>
         <div> Author: <input
+          id="author"
           value={newAuthor}
           onChange={handleAuthorChange}
         /></div>
         <div> URL: <input
+          id="url"
           value={newUrl}
           onChange={handleUrlChange}
         /></div>
         <div>
-          <button type="submit">Add</button>
+          <button id="submit-blog" type="submit">Add</button>
         </div>
       </form>
     </div>
