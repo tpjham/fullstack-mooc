@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-const Blog = ({ blog, blogUpvote }) => {
+const Blog = ({ blog, blogUpvote, blogRemove }) => {
   const [ showInfo, toggleShowInfo ] = useState(false)
 
   const blogUser = blog.user
@@ -19,24 +19,33 @@ const Blog = ({ blog, blogUpvote }) => {
     })
   }
 
+  const removeBlog = (event) => {
+    event.preventDefault()
+
+    blogRemove(blog)
+  }
+
   const blogInfo = () => (
     <div>
-      <div>
+      <div id="url">
         {blog.url}
       </div>
-      <div>
-        {blog.likes} <button onClick={upvoteBlog}>Like</button>
+      <div id="likes">
+        Likes: {blog.likes} <button onClick={upvoteBlog}>Like</button>
+      </div>
+      <div id="user">
+        {blogUser === null ?
+          "No user" :
+          blog.user.name}
       </div>
       <div>
-        {blogUser === null ?
-          "" :
-          blog.user.name}
+        <button id="remove-blog" onClick={removeBlog}> Remove blog </button>
       </div>
     </div>
   )
 
   return (
-    <div className="blog">
+    <li className="blog">
       {blog.title} by {blog.author} <button onClick={() => toggleShowInfo(!showInfo)}>
         {showInfo ?
           "Hide" :
@@ -46,7 +55,7 @@ const Blog = ({ blog, blogUpvote }) => {
         blogInfo() :
         ""
       }
-    </div>
+    </li>
   )
 }
 
