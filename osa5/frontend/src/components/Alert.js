@@ -1,12 +1,12 @@
-import React from "react";
+import React from "react"
 
 const Alert = ({ message, alertStyle }) => {
-  if (message === null && alertStyle == null) {
+  if (message === null && alertStyle === null) {
     return (
       null
     )
   }
-  
+
   return (
     <div className={alertStyle}>
       {message}
@@ -14,4 +14,4 @@ const Alert = ({ message, alertStyle }) => {
   )
 }
 
-export default Alert;
+export default Alert
